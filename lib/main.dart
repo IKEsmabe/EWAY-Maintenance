@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'tire_maintenance_screen.dart'; // Import the Tire Maintenance Screen
-import 'battery_maintenance_screen.dart'; // Import the Battery Maintenance Screen
-import 'services_maintenance_screen.dart'; // Import the Services Maintenance Screen
-import 'maintenance_guide_screen.dart'; // Import the Maintenance Guide Screen
 
 void main() {
   runApp(const MyApp());
@@ -14,82 +10,56 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const MaintenanceGuideScreen(), // Set MaintenanceGuideScreen as the home screen
+      debugShowCheckedModeBanner: false,
+      home: const MainScreen(), // Set MainScreen as home
     );
   }
 }
 
-class MaintenanceGuideScreen extends StatelessWidget {
-  const MaintenanceGuideScreen({super.key});
+class MainScreen extends StatelessWidget {
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.green[800],
-        title: const Text(
-          'Maintenance Guide',
-          style: TextStyle(color: Colors.white),
-        ),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: const CustomTopBar(), // Add the custom top bar
+      body: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
             const Text(
               'Maintenance Guide',
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
+                color: Colors.green,
               ),
             ),
-            const SizedBox(height: 40),
-            // Row for 3 options
-            Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                children: [
-                  // Battery Card
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const BatteryMaintenanceScreen()),
-                      );
-                    },
-                    child: buildMaintenanceCard('assets/battery.png', 'Battery'),
-                  ),
-                  // Tire Card
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const TireMaintenanceScreen()),
-                      );
-                    },
-                    child: buildMaintenanceCard('assets/tire.png', 'Tire'),
-                  ),
-                  // Services Card
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => const ServicesMaintenanceScreen()),
-                      );
-                    },
-                    child: buildMaintenanceCard('assets/services.png', 'Services'),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _maintenanceButton(
+                  context,
+                  'lib/assets/battery.png',
+                  'Battery',
+                  const BatteryMaintenanceScreen(),
+                ),
+                const SizedBox(width: 20),
+                _maintenanceButton(
+                  context,
+                  'lib/assets/tire.png',
+                  'Tire',
+                  const TireMaintenanceScreen(),
+                ),
+                const SizedBox(width: 20),
+                _maintenanceButton(
+                  context,
+                  'lib/assets/services.png',
+                  'Services',
+                  const ServicesMaintenanceScreen(),
+                ),
+              ],
             ),
           ],
         ),
@@ -97,34 +67,158 @@ class MaintenanceGuideScreen extends StatelessWidget {
     );
   }
 
-  // Card Builder Function
-  Widget buildMaintenanceCard(String imagePath, String label) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 5,
-            offset: const Offset(0, 3),
+  Widget _maintenanceButton(BuildContext context, String imagePath, String label, Widget destination) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => destination),
+            );
+          },
+          child: Column(
+            children: [
+              Image.asset(imagePath, width: 100, height: 100),
+              const SizedBox(height: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+// ✅ Custom Top Bar widget (Nav bar)
+class CustomTopBar extends StatelessWidget implements PreferredSizeWidget {
+  const CustomTopBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: const Color(0xFFAED9B6), // Light green background color
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left-side navigation links
+          Row(
+            children: [
+              _navItem(context, 'Home', const MainScreen()),
+              const SizedBox(width: 16),
+              _navItem(context, 'Showcase', const PlaceholderScreen(title: 'Showcase')),
+              const SizedBox(width: 16),
+              _navItem(context, 'Registration', const PlaceholderScreen(title: 'Registration')),
+              const SizedBox(width: 16),
+              _navItem(context, 'Regulations', const PlaceholderScreen(title: 'Regulations')),
+              const SizedBox(width: 16),
+              _navItem(context, 'Maintenance', const PlaceholderScreen(title: 'Maintenance')),
+            ],
+          ),
+          // Right-side Sign In
+          InkWell(
+            onTap: () {
+              // Handle Sign In tap
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign In tapped!')));
+            },
+            child: const Text(
+              'Sign In',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          )
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(imagePath, height: 80, width: 80, fit: BoxFit.cover),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-        ],
+    );
+  }
+
+  // Helper method for navigation item
+  Widget _navItem(BuildContext context, String title, Widget destination) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => destination),
+        );
+      },
+      child: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(60);
+}
+
+// ✅ Placeholder screen for demo purposes
+class PlaceholderScreen extends StatelessWidget {
+  final String title;
+
+  const PlaceholderScreen({super.key, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomTopBar(),
+      body: Center(
+        child: Text(title, style: const TextStyle(fontSize: 24)),
+      ),
+    );
+  }
+}
+
+class BatteryMaintenanceScreen extends StatelessWidget {
+  const BatteryMaintenanceScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomTopBar(),
+      body: const Center(
+        child: Text('Battery Maintenance Screen'),
+      ),
+    );
+  }
+}
+
+class TireMaintenanceScreen extends StatelessWidget {
+  const TireMaintenanceScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomTopBar(),
+      body: const Center(
+        child: Text('Tire Maintenance Screen'),
+      ),
+    );
+  }
+}
+
+class ServicesMaintenanceScreen extends StatelessWidget {
+  const ServicesMaintenanceScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const CustomTopBar(),
+      body: const Center(
+        child: Text('Services Maintenance Screen'),
       ),
     );
   }
